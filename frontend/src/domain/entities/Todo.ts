@@ -1,5 +1,5 @@
 /**
- * Todoエンティティインターフェース
+ * Todoエンティティのインターフェース
  */
 export interface Todo {
   id: number;
@@ -10,16 +10,16 @@ export interface Todo {
 }
 
 /**
- * 新規Todo作成用インターフェース
+ * Todo作成時のデータ型
  */
-export interface CreateTodoRequest {
+export interface CreateTodoDTO {
   title: string;
 }
 
 /**
- * Todo更新用インターフェース
+ * Todo更新時のデータ型
  */
-export interface UpdateTodoRequest {
+export interface UpdateTodoDTO {
   title?: string;
   completed?: boolean;
 }

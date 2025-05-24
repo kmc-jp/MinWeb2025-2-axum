@@ -23,9 +23,9 @@ body {
 }
 
 .app {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .app-header {
@@ -39,25 +39,25 @@ body {
 .app-main {
   flex: 1;
   padding: 2rem;
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  width: 100%;
 }
 
 .app-footer {
   background-color: var(--dark-color);
   color: var(--light-color);
-  text-align: center;
   padding: 1rem;
+  text-align: center;
   margin-top: 2rem;
 }
 
 /* Todo Container */
 .todo-container {
   background-color: white;
+  padding: 2rem;
   border-radius: var(--border-radius);
   box-shadow: var(--box-shadow);
-  padding: 2rem;
 }
 
 .todo-container h1 {
@@ -74,19 +74,19 @@ body {
 .todo-input {
   flex: 1;
   padding: 0.75rem;
+  font-size: 1rem;
   border: 1px solid #ddd;
   border-radius: var(--border-radius) 0 0 var(--border-radius);
-  font-size: 1rem;
 }
 
 .todo-submit-btn {
+  padding: 0.75rem 1.5rem;
   background-color: var(--primary-color);
   color: white;
   border: none;
-  padding: 0.75rem 1.5rem;
-  font-size: 1rem;
   border-radius: 0 var(--border-radius) var(--border-radius) 0;
   cursor: pointer;
+  font-size: 1rem;
   transition: background-color 0.2s;
 }
 
@@ -104,19 +104,19 @@ body {
 /* Todo Item */
 .todo-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   padding: 1rem;
+  background-color: var(--light-color);
   border: 1px solid #eee;
   border-radius: var(--border-radius);
-  background-color: var(--light-color);
 }
 
 .todo-content {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
   flex: 1;
+  gap: 0.75rem;
 }
 
 .todo-checkbox {
@@ -158,6 +158,11 @@ body {
   background-color: #e0a800;
 }
 
+.todo-edit-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}
+
 .todo-delete-btn {
   background-color: var(--danger-color);
   color: white;
@@ -167,31 +172,23 @@ body {
   background-color: #c9302c;
 }
 
-.todo-edit-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* Error and Loading States */
 .error-message {
+  margin-bottom: 1rem;
+  padding: 1rem;
   background-color: #f8d7da;
   color: #721c24;
-  padding: 1rem;
-  margin-bottom: 1rem;
-  border-radius: var(--border-radius);
   border: 1px solid #f5c6cb;
+  border-radius: var(--border-radius);
 }
 
-.loading {
-  text-align: center;
+.loading,
+.empty-message {
   padding: 2rem 0;
+  text-align: center;
   color: #666;
 }
 
 .empty-message {
-  text-align: center;
-  padding: 2rem 0;
-  color: #666;
   font-style: italic;
 }
 
@@ -211,8 +208,8 @@ body {
 
 .modal-content {
   background-color: white;
-  border-radius: var(--border-radius);
   padding: 1.5rem;
+  border-radius: var(--border-radius);
   width: 90%;
   max-width: 500px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -229,8 +226,8 @@ body {
   background: none;
   border: none;
   font-size: 1.5rem;
-  cursor: pointer;
   color: #666;
+  cursor: pointer;
 }
 
 .modal-close-btn:hover {

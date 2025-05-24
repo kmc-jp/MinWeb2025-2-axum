@@ -1,9 +1,9 @@
 import React from 'react';
-import TodoForm from './TodoForm';
 import { Todo } from '../../domain/entities/Todo';
+import TodoForm from './TodoForm';
 
 interface EditTodoModalProps {
-  todo: Todo | null;
+  todo: Todo;
   onClose: () => void;
   onSave: (id: number, title: string) => void;
 }
@@ -15,7 +15,7 @@ const EditTodoModal: React.FC<EditTodoModalProps> = ({ todo, onClose, onSave }) 
     <div className="modal-overlay">
       <div className="modal-content">
         <div className="modal-header">
-          <h3>ToDoの編集</h3>
+          <h3>Todoの編集</h3>
           <button className="modal-close-btn" onClick={onClose}>×</button>
         </div>
         <div className="modal-body">

@@ -1,19 +1,16 @@
 import axios from 'axios';
-import { Todo, CreateTodoRequest, UpdateTodoRequest } from '../../domain/entities/Todo';
+import { Todo, CreateTodoDTO, UpdateTodoDTO } from '../../domain/entities/Todo';
 
-// API基本URL
-const API_BASE_URL = '/api/todos';
+// API URLの設定 (環境変数または固定値)
+const API_URL = '/api/todos';
 
-/**
- * TodoのAPI通信を担当するクラス
- */
-export class TodoApiClient {
+export class TodoApi {
   /**
-   * すべてのTodoを取得
+   * すべてのTodoを取得する
    */
   static async getAllTodos(): Promise<Todo[]> {
     try {
-      const response = await axios.get<Todo[]>(API_BASE_URL);
+      const response = await axios.get(API_URL);
       return response.data;
     } catch (error) {
       console.error('Todoリスト取得エラー:', error);
@@ -22,11 +19,11 @@ export class TodoApiClient {
   }
 
   /**
-   * IDでTodoを取得
+   * 指定したIDのTodoを取得する
    */
   static async getTodoById(id: number): Promise<Todo> {
     try {
-      const response = await axios.get<Todo>(`${API_BASE_URL}/${id}`);
+      const response = await axios.get(`${API_URL}/${id}`);
       return response.data;
     } catch (error) {
       console.error(`ID: ${id} のTodo取得エラー:`, error);
@@ -35,11 +32,11 @@ export class TodoApiClient {
   }
 
   /**
-   * 新しいTodoを作成
+   * 新しいTodoを作成する
    */
-  static async createTodo(todoData: CreateTodoRequest): Promise<Todo> {
+  static async createTodo(todoData: CreateTodoDTO): Promise<Todo> {
     try {
-      const response = await axios.post<Todo>(API_BASE_URL, todoData);
+      const response = await axios.post(API_URL, todoData);
       return response.data;
     } catch (error) {
       console.error('Todo作成エラー:', error);
@@ -48,11 +45,11 @@ export class TodoApiClient {
   }
 
   /**
-   * Todoを更新
+   * 指定したTodoを更新する
    */
-  static async updateTodo(id: number, todoData: UpdateTodoRequest): Promise<Todo> {
+  static async updateTodo(id: number, todoData: UpdateTodoDTO): Promise<Todo> {
     try {
-      const response = await axios.put<Todo>(`${API_BASE_URL}/${id}`, todoData);
+      const response = await axios.put(`${API_URL}/${id}`, todoData);
       return response.data;
     } catch (error) {
       console.error(`ID: ${id} のTodo更新エラー:`, error);
@@ -61,11 +58,11 @@ export class TodoApiClient {
   }
 
   /**
-   * Todoを完了状態に変更
+   * Todoを完了状態に変更する
    */
   static async completeTodo(id: number): Promise<Todo> {
     try {
-      const response = await axios.patch<Todo>(`${API_BASE_URL}/${id}/complete`, {});
+      const response = await axios.patch(`${API_URL}/${id}/complete`, {});
       return response.data;
     } catch (error) {
       console.error(`ID: ${id} のTodo完了状態変更エラー:`, error);
@@ -74,11 +71,11 @@ export class TodoApiClient {
   }
 
   /**
-   * Todoを削除
+   * 指定したTodoを削除する
    */
   static async deleteTodo(id: number): Promise<void> {
     try {
-      await axios.delete(`${API_BASE_URL}/${id}`);
+      await axios.delete(`${API_URL}/${id}`);
     } catch (error) {
       console.error(`ID: ${id} のTodo削除エラー:`, error);
       throw new Error(`ID: ${id} のTodoの削除に失敗しました`);

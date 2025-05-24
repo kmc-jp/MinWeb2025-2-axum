@@ -3,55 +3,6 @@
 ## プロジェクト概要
 MinWeb2025はシンプルなWebアプリケーションのサンプルプロジェクトです。フロントエンドはReact、バックエンドはNode.js (Express)、データベースはMySQLを使用しています。
 
-## ディレクトリ構成
-
-```
-MinWeb2025-2/
-├── backend/                 # バックエンドアプリケーション
-│   ├── src/
-│   │   ├── domain/          # ドメイン層
-│   │   │   ├── entities/    # ビジネスエンティティ
-│   │   │   └── repositories/ # リポジトリインターフェース
-│   │   ├── application/     # アプリケーション層
-│   │   │   └── usecases/    # ユースケース
-│   │   ├── interfaces/      # インターフェース層
-│   │   │   └── controllers/ # コントローラー
-│   │   ├── infrastructure/  # インフラストラクチャ層
-│   │   │   └── repositories/ # リポジトリ実装
-│   │   ├── routes/          # APIルート定義
-│   │   └── index.ts         # アプリケーションエントリーポイント
-│   ├── tests/               # テスト
-│   │   ├── unit/            # ユニットテスト
-│   │   ├── integration/     # 統合テスト
-│   │   └── api/             # APIテスト
-│   └── package.json         # 依存関係定義
-│
-├── frontend/                 # フロントエンドアプリケーション
-│   ├── src/
-│   │   ├── domain/          # ドメイン層
-│   │   │   └── entities/    # ビジネスエンティティ
-│   │   ├── infrastructure/  # インフラストラクチャ層
-│   │   │   └── api/         # API通信処理
-│   │   ├── presentation/    # プレゼンテーション層
-│   │   │   ├── components/  # 共通UIコンポーネント
-│   │   │   └── pages/       # ページコンポーネント
-│   │   ├── App.tsx          # メインアプリケーションコンポーネント
-│   │   └── index.tsx        # エントリーポイント
-│   ├── __tests__/           # テスト
-│   │   ├── components/      # コンポーネントテスト
-│   │   └── hooks/           # カスタムフックテスト
-│   └── package.json         # 依存関係定義
-│
-├── nginx/                    # Nginx設定
-│   ├── conf.d/              # Nginx構成ファイル
-│   └── logs/                # Nginxログファイル
-│
-├── mysql/                    # MySQL設定
-│   └── init/                # データベース初期化スクリプト
-│
-└── docker-compose.yml        # Dockerコンテナ定義
-```
-
 ## アーキテクチャ
 このプロジェクトはドメイン駆動設計（DDD）とクリーンアーキテクチャの原則に基づいて構築されています。
 
