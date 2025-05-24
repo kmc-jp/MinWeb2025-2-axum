@@ -185,8 +185,9 @@ npm test -- -t "テスト名" # 特定のテストのみ実行
    - `supertest`を使用してHTTPリクエストをシミュレート
 
 #### テストの作成方法
+
+**バックエンドAPIテスト例**:
 ```typescript
-// APIテストの例
 import request from 'supertest';
 import app from '../app';
 
@@ -202,12 +203,12 @@ describe('API Tests', () => {
 ### フロントエンドテスト
 React Testing Libraryを使用したコンポーネントテストを実施します。
 
-#### テストの実行
+#### テストの実行コマンド
 ```bash
 cd frontend
-npm test                  # インタラクティブモードで全テストを実行
-npm test -- --watchAll=false # 一度だけ全テストを実行
-npm test -- -t "テスト名" # 特定のテストのみ実行
+npm test                      # インタラクティブモードで実行
+npm test -- --watchAll=false  # 一度だけ全テスト実行
+npm test -- -t "テスト名"     # 特定のテストのみ実行
 ```
 
 #### テストの種類
@@ -271,14 +272,21 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 
 継続的インテグレーションと継続的デリバリーは、GitHub Actionsを使って自動化されています。
 
+### ワークフロー構成
+
+リポジトリには以下のGitHub Actionsワークフローがあります：
+
+1. **デプロイワークフロー** (deploy.yml)
+   - mainブランチへのプッシュ時に実行
+   - 本番サーバーへのデプロイ
+
 ### シークレットの設定
 
 GitHub Actionsで使用するシークレットを設定する必要があります。以下のシークレットをリポジトリの設定から追加してください：
 
 1. `SSH_PRIVATE_KEY`: 本番サーバーへ接続するためのSSH秘密鍵
-2. `SSH_KNOWN_HOSTS`: 本番サーバーのSSHフィンガープリント
-3. `SERVER_HOST`: 本番サーバーのホスト名またはIPアドレス
-4. `SERVER_USER`: 本番サーバーのユーザー名
+2. `HOST`: 本番サーバーのホスト名またはIPアドレス
+3. `SSH_USER`: 本番サーバーのユーザー名
 
 ### シークレットの取得方法
 
@@ -287,27 +295,28 @@ GitHub Actionsで使用するシークレットを設定する必要がありま
 cat ~/.ssh/id_rsa
 ```
 
-#### SSH_KNOWN_HOSTS
-```bash
-ssh-keyscan -H YOUR_SERVER_IP >> ~/.ssh/known_hosts
-cat ~/.ssh/known_hosts
-```
+#### HOSTとSSH_USER
+デプロイ先のサーバーホスト名（またはIPアドレス）とSSHログイン用ユーザー名を設定してください。
 
 ### 本番サーバーの準備
 
 本番サーバーでは以下の準備が必要です：
 
-1. Node.jsとnpmのインストール
-2. PM2のインストール (`npm install -g pm2`)
-3. デプロイ先ディレクトリの作成 (`mkdir -p ~/minweb`)
-4. SSH公開鍵の設定
+1. Dockerとdocker-composeのインストール
+2. デプロイ先ディレクトリの作成 (`mkdir -p ~/MinWeb2025-2`)
+3. SSH公開鍵の設定（authorized_keysへの追加）
 
-主な自動化ステップ:
-1. コードの静的解析とバックエンドのテスト実行
-2. アプリケーションのビルド
-3. 本番環境へのデプロイ (mainブランチへのマージ時のみ)
+### デプロイの流れ
+
+mainブランチへの変更がプッシュされると、以下の手順で自動的にデプロイされます：
+
+1. SSH経由で本番サーバーに接続
+2. アプリケーションコードを本番サーバーにコピー 
+3. docker-composeでアプリケーションを再起動
 
 ### 注意事項
 
 - デプロイスクリプトは基本的なものです。必要に応じてカスタマイズしてください。
 - 本番環境の環境変数は別途設定する必要があります。
+- 必要に応じてバックアップ戦略を実装してください。
+- デプロイ前に手動承認ステップを追加することも検討できます。
