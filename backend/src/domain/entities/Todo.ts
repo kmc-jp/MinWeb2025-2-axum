@@ -78,8 +78,8 @@ export class Todo {
       throw new Error('タイトルは必須項目です');
     }
     
-    if (title.length > 100) {
-      throw new Error('タイトルは100文字以内で入力してください');
+    if (title.length > 30) {
+      throw new Error('タイトルは30文字以内で入力してください');
     }
   }
 }

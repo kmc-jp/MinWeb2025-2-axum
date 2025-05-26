@@ -7,7 +7,7 @@ import todoRoutes from './interfaces/controllers/todoController';
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 
 // ミドルウェアの設定
 app.use(cors());
@@ -22,10 +22,8 @@ app.get('/api/status', (req, res) => {
 });
 
 // サーバーの起動
-if (process.env.NODE_ENV !== 'test') {
-  app.listen(PORT, () => {
-    console.log(`サーバーが起動しました: http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+  console.log(`サーバーが起動しました: http://localhost:${PORT}`);
+});
 
 export default app;
