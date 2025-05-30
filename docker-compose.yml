@@ -1,0 +1,84 @@
+services:
+    backend:
+        image: node:20-alpine
+        container_name: backend
+        working_dir: /app
+        volumes:
+            - ./backend:/app
+        ports:
+            - "3000:3000"
+        environment:
+            - NODE_ENV=development
+            - DB_HOST=mysql
+            - DB_USER=user
+            - DB_PASSWORD=password
+            - DB_NAME=minweb
+            - DB_PORT=3306
+        depends_on:
+            mysql:
+                condition: service_healthy
+        command: sh -c "npm install && npm run build && npm start"
+        restart: unless-stopped
+        networks:
+            - app-network
+
+    frontend:
+        image: node:20-alpine
+        container_name: frontend
+        working_dir: /app
+        volumes:
+            - ./frontend:/app
+            - frontend_build:/var/www/html
+        environment:
+            - REACT_APP_API_URL=http://localhost:3000/api
+        command: sh -c "npm install && npm run build && cp -r build/* /var/www/html/"
+        depends_on:
+            - backend
+        networks:
+            - app-network
+
+    nginx:
+        image: nginx:alpine
+        container_name: nginx
+        ports:
+            - "80:80"
+        volumes:
+            - ./nginx/conf.d:/etc/nginx/conf.d
+            - ./nginx/logs:/var/log/nginx
+            - frontend_build:/var/www/html
+        depends_on:
+            - backend
+            - frontend
+        restart: unless-stopped
+        networks:
+            - app-network
+
+    mysql:
+        image: mysql:8.0
+        container_name: mysql
+        ports:
+            - "3306:3306"
+        volumes:
+            - mysql_data:/var/lib/mysql
+            - ./mysql/init:/docker-entrypoint-initdb.d
+        environment:
+            - MYSQL_ROOT_PASSWORD=rootpassword
+            - MYSQL_DATABASE=minweb
+            - MYSQL_USER=user
+            - MYSQL_PASSWORD=password
+        restart: unless-stopped
+        networks:
+            - app-network
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "user", "--password=password"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+
+volumes:
+    mysql_data:
+    frontend_build:
+
+networks:
+    app-network:
+        driver: bridge
