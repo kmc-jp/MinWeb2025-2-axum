@@ -1,10 +1,7 @@
 # MinWeb2025-2
 
 ## プロジェクト概要
-MinWeb2025はシンプルなWebアプリケーションのサンプルプロジェクトです。フロントエンドはReact、バックエンドはNode.js (Express)、データベースはMySQLを使用しています。
-
-## アーキテクチャ
-このプロジェクトはドメイン駆動設計（DDD）とクリーンアーキテクチャの原則に基づいて構築されています。
+MinWeb2025のサンプルプロジェクトです。フロントエンドはReact、バックエンドはNode.js (Express)、データベースはMySQLを使用しています。
 
 ### バックエンド構成
 バックエンドは以下のレイヤーで構成されています：
@@ -24,7 +21,7 @@ MinWeb2025はシンプルなWebアプリケーションのサンプルプロジ�
 - `infrastructure/repositories`: リポジトリの具体的な実装（MySQLなど）を提供します
 
 ### フロントエンド構成
-フロントエンドも類似のレイヤードアーキテクチャを採用しています：
+フロントエンドも類似のアーキテクチャを採用しています：
 
 #### ドメイン層
 - `domain/entities`: ビジネスオブジェクトを定義します
@@ -42,58 +39,22 @@ MinWeb2025はシンプルなWebアプリケーションのサンプルプロジ�
 - データベース: MySQL
 - 開発/デプロイ: Docker, docker-compose
 
-## 実行方法
-```bash
-# プロジェクトのルートディレクトリで以下を実行
-docker-compose up -d
-```
-
-アプリケーションは http://localhost にアクセスして利用できます。
-APIは http://localhost/api でアクセス可能です。
-
 ## 開発ガイド
-
-### コーディング規約
-
-#### 全般
-- インデントはスペース2文字を使用
-- セミコロンは必須
-- 命名規則：
-  - クラス: PascalCase (例: `UserController`)
-  - 変数/関数/メソッド: camelCase (例: `getAllUsers`)
-  - 定数: UPPER_SNAKE_CASE (例: `API_URL`)
-  - ファイル名: PascalCaseまたはcamelCase (コンテキストに応じて)
-
-#### TypeScript
-- `strict`モードを有効に
-- タイプ推論よりも明示的な型定義を優先
-- インターフェースを活用しプログラムの契約を明確に
-
-#### React
-- 状態管理は必要に応じてReactのhooksを使用
-- コンポーネントはできるだけ純粋関数として実装
-- Propsの型は明示的に定義
 
 ### Docker環境
 
 #### 構成
-- `nodejs`: バックエンドサービス (Node.js/Express)
+- `backend`: バックエンドサービス (Node.js/Express)
 - `frontend`: フロントエンドビルド環境 (React)
 - `nginx`: Webサーバー (静的ファイル配信・リバースプロキシ)
 - `mysql`: データベースサービス
 
 #### 開発環境の操作
 ```bash
-# 初回起動
+# 起動
 docker-compose up -d
 
-# コンテナ一覧の確認
-docker-compose ps
-
-# ログの確認
-docker-compose logs -f [サービス名]
-
-# 環境の停止
+# 停止
 docker-compose down
 
 # ボリュームも含めて完全に環境を削除
@@ -115,18 +76,101 @@ cd frontend
 npm run build
 ```
 
-#### テスト実行
-```bash
-cd frontend
-npm test
-```
-
 #### 主要ファイル
 - `src/index.tsx`: エントリーポイント
+  ```tsx
+  import React from 'react';
+  import ReactDOM from 'react-dom/client';
+  import App from './App';
+
+  const root = ReactDOM.createRoot(document.getElementById('root') as HTMLElement);
+  root.render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>
+  );
+  ```
+
 - `src/App.tsx`: メインアプリケーションコンポーネント
+  ```tsx
+  import React from 'react';
+  import { BrowserRouter, Routes, Route } from 'react-router-dom';
+  import { HomePage, TaskListPage, TaskDetailPage } from './presentation/pages';
+  import { Header, Footer } from './presentation/components/common';
+
+  const App: React.FC = () => {
+    return (
+      <BrowserRouter>
+        <Header />
+        <main>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/tasks" element={<TaskListPage />} />
+            <Route path="/tasks/:id" element={<TaskDetailPage />} />
+          </Routes>
+        </main>
+        <Footer />
+      </BrowserRouter>
+    );
+  };
+
+  export default App;
+  ```
+
 - `src/domain/entities/`: ドメインオブジェクト
+  ```tsx
+  // src/domain/entities/Task.ts
+  export interface Task {
+    id: number;
+    title: string;
+    description: string;
+    completed: boolean;
+    createdAt: Date;
+  }
+  ```
+
 - `src/infrastructure/api/`: API通信処理
+  ```tsx
+  // src/infrastructure/api/taskApi.ts
+  import { Task } from '../../domain/entities/Task';
+
+  const API_BASE_URL = '/api';
+
+  export const fetchTasks = async (): Promise<Task[]> => {
+    const response = await fetch(`${API_BASE_URL}/tasks`);
+    if (!response.ok) throw new Error('Failed to fetch tasks');
+    return response.json();
+  };
+
+  export const fetchTaskById = async (id: number): Promise<Task> => {
+    const response = await fetch(`${API_BASE_URL}/tasks/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch task');
+    return response.json();
+  };
+  ```
+
 - `src/presentation/`: UI関連のコンポーネント
+  ```tsx
+  // src/presentation/components/task/TaskItem.tsx
+  import React from 'react';
+  import { Task } from '../../../domain/entities/Task';
+
+  interface TaskItemProps {
+    task: Task;
+    onComplete: (id: number) => void;
+  }
+
+  export const TaskItem: React.FC<TaskItemProps> = ({ task, onComplete }) => {
+    return (
+      <div className="task-item">
+        <h3>{task.title}</h3>
+        <p>{task.description}</p>
+        <span>{task.completed ? '完了' : '未完了'}</span>
+        <button onClick={() => onComplete(task.id)}>完了にする</button>
+      </div>
+    );
+  };
+  ```
 
 ### バックエンド開発 (Node.js)
 
@@ -143,118 +187,130 @@ cd backend
 npm run build
 ```
 
-#### テスト実行
-```bash
-cd backend
-npm test
-```
-
 #### 主要ファイル
 - `src/index.ts`: エントリーポイント
-- `src/routes/`: APIルート定義
-- `src/domain/`: ドメイン層（エンティティ、リポジトリインターフェース）
-- `src/application/`: アプリケーション層（ユースケース）
-- `src/interfaces/`: インターフェース層（コントローラー）
-- `src/infrastructure/`: インフラストラクチャ層（リポジトリ実装など）
+  ```ts
+  import express from 'express';
+  import cors from 'cors';
+  import taskRoutes from './routes/taskRoutes';
 
-## テスト戦略
+  const app = express();
+  const PORT = process.env.PORT || 3000;
 
-### バックエンドテスト
-テストフレームワークとしてJestを採用しています。
+  app.use(cors());
+  app.use(express.json());
 
-#### テストの実行
-```bash
-cd backend
-npm test                  # 全テストを実行
-npm test -- --watch       # ウォッチモードで実行（ファイル変更時に自動実行）
-npm test -- -t "テスト名" # 特定のテストのみ実行
-```
+  // ルートの設定
+  app.use('/api/tasks', taskRoutes);
 
-#### テストの種類
-1. **ユニットテスト**: 個々の関数やクラスの挙動をテスト
-   - 場所: `backend/src/tests/unit/`
-   - 命名規則: `*.test.ts`
-   
-2. **統合テスト**: 複数のコンポーネントの連携をテスト
-   - 場所: `backend/src/tests/integration/`
-   - 命名規則: `*.test.ts`
-   
-3. **APIテスト**: エンドポイントの挙動をテスト
-   - 場所: `backend/src/tests/api/`
-   - 命名規則: `*.test.ts`
-   - `supertest`を使用してHTTPリクエストをシミュレート
-
-#### テストの作成方法
-
-**バックエンドAPIテスト例**:
-```typescript
-import request from 'supertest';
-import app from '../app';
-
-describe('API Tests', () => {
-  test('GET /api/status should return status', async () => {
-    const response = await request(app).get('/api/status');
-    expect(response.status).toBe(200);
-    expect(response.body).toHaveProperty('status', 'running');
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
   });
-});
-```
+  ```
 
-### フロントエンドテスト
-React Testing Libraryを使用したコンポーネントテストを実施します。
+- `src/routes/`: APIルート定義
+  ```ts
+  // src/routes/taskRoutes.ts
+  import { Router } from 'express';
+  import { TaskController } from '../interfaces/controllers/TaskController';
 
-#### テストの実行コマンド
-```bash
-cd frontend
-npm test                      # インタラクティブモードで実行
-npm test -- --watchAll=false  # 一度だけ全テスト実行
-npm test -- -t "テスト名"     # 特定のテストのみ実行
-```
+  const router = Router();
+  const taskController = new TaskController();
 
-#### テストの種類
-1. **コンポーネントテスト**: UIコンポーネントの挙動をテスト
-   - 場所: `frontend/src/__tests__/components/`
-   - 命名規則: `*.test.tsx`
-   
-2. **カスタムフックテスト**: 独自フックの挙動をテスト
-   - 場所: `frontend/src/__tests__/hooks/`
-   - 命名規則: `*.test.ts`
+  router.get('/', taskController.getAllTasks);
+  router.get('/:id', taskController.getTaskById);
+  router.post('/', taskController.createTask);
+  router.put('/:id', taskController.updateTask);
+  router.delete('/:id', taskController.deleteTask);
 
-3. **E2Eテスト**: ユーザーフローを自動化テスト (Cypress)
-   - 場所: `frontend/cypress/integration/`
-   - 命名規則: `*.spec.js`
+  export default router;
+  ```
 
-#### テストの作成方法
-```jsx
-// コンポーネントテストの例
-import { render, screen } from '@testing-library/react';
-import HomePage from '../HomePage';
+- `src/domain/`: ドメイン層（エンティティ、リポジトリインターフェース）
+  ```ts
+  // src/domain/entities/Task.ts
+  export interface Task {
+    id?: number;
+    title: string;
+    description: string;
+    completed: boolean;
+    createdAt?: Date;
+  }
 
-test('renders home page heading', () => {
-  render(<HomePage />);
-  expect(screen.getByText('Welcome to MinWeb2025')).toBeInTheDocument();
-});
-```
+  // src/domain/repositories/TaskRepository.ts
+  import { Task } from '../entities/Task';
 
-### モック
-外部APIや依存関係のモックには、Jest のモック機能を活用します。
+  export interface TaskRepository {
+    findAll(): Promise<Task[]>;
+    findById(id: number): Promise<Task | null>;
+    create(task: Task): Promise<Task>;
+    update(id: number, task: Partial<Task>): Promise<Task | null>;
+    delete(id: number): Promise<boolean>;
+  }
+  ```
 
-```typescript
-// APIクライアントのモック例
-jest.mock('../api/apiClient', () => ({
-  getData: jest.fn().mockResolvedValue({
-    name: 'Test Data'
-  })
-}));
-```
+- `src/application/`: アプリケーション層（ユースケース）
+  ```ts
+  // src/application/usecases/task/GetAllTasksUseCase.ts
+  import { Task } from '../../../domain/entities/Task';
+  import { TaskRepository } from '../../../domain/repositories/TaskRepository';
 
-## デプロイ
+  export class GetAllTasksUseCase {
+    constructor(private taskRepository: TaskRepository) {}
 
-### 本番環境へのデプロイ
-```bash
-# 本番環境用のビルド・デプロイ
-docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
-```
+    async execute(): Promise<Task[]> {
+      return this.taskRepository.findAll();
+    }
+  }
+  ```
+
+- `src/interfaces/`: インターフェース層（コントローラー）
+  ```ts
+  // src/interfaces/controllers/TaskController.ts
+  import { Request, Response } from 'express';
+  import { GetAllTasksUseCase } from '../../application/usecases/task/GetAllTasksUseCase';
+  import { GetTaskByIdUseCase } from '../../application/usecases/task/GetTaskByIdUseCase';
+  import { MySQLTaskRepository } from '../../infrastructure/repositories/MySQLTaskRepository';
+
+  const taskRepository = new MySQLTaskRepository();
+
+  export class TaskController {
+    async getAllTasks(req: Request, res: Response): Promise<void> {
+      try {
+        const useCase = new GetAllTasksUseCase(taskRepository);
+        const tasks = await useCase.execute();
+        res.json(tasks);
+      } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    }
+
+    // 他のコントローラーメソッド...
+  }
+  ```
+
+- `src/infrastructure/`: インフラストラクチャ層（リポジトリ実装など）
+  ```ts
+  // src/infrastructure/repositories/MySQLTaskRepository.ts
+  import { Task } from '../../domain/entities/Task';
+  import { TaskRepository } from '../../domain/repositories/TaskRepository';
+  import { pool } from '../database/mysql';
+
+  export class MySQLTaskRepository implements TaskRepository {
+    async findAll(): Promise<Task[]> {
+      const [rows] = await pool.query('SELECT * FROM tasks');
+      return rows as Task[];
+    }
+
+    async findById(id: number): Promise<Task | null> {
+      const [rows] = await pool.query('SELECT * FROM tasks WHERE id = ?', [id]);
+      const tasks = rows as Task[];
+      return tasks.length > 0 ? tasks[0] : null;
+    }
+
+    // 他のリポジトリメソッド...
+  }
+  ```
 
 ### データベース
 
@@ -262,61 +318,8 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 データベースの初期化スクリプトは `mysql/init/` ディレクトリに配置されています。
 
 #### 接続情報
-- ホスト: `localhost` (開発PCの場合) または `mysql` (コンテナ内から)
+- ホスト:  `mysql` (コンテナ内から)
 - ユーザー: `user`
 - パスワード: `password`
 - データベース名: `minweb`
 - ポート: `3306`
-
-## CI/CD
-
-継続的インテグレーションと継続的デリバリーは、GitHub Actionsを使って自動化されています。
-
-### ワークフロー構成
-
-リポジトリには以下のGitHub Actionsワークフローがあります：
-
-1. **デプロイワークフロー** (deploy.yml)
-   - mainブランチへのプッシュ時に実行
-   - 本番サーバーへのデプロイ
-
-### シークレットの設定
-
-GitHub Actionsで使用するシークレットを設定する必要があります。以下のシークレットをリポジトリの設定から追加してください：
-
-1. `SSH_PRIVATE_KEY`: 本番サーバーへ接続するためのSSH秘密鍵
-2. `HOST`: 本番サーバーのホスト名またはIPアドレス
-3. `SSH_USER`: 本番サーバーのユーザー名
-
-### シークレットの取得方法
-
-#### SSH_PRIVATE_KEY
-```bash
-cat ~/.ssh/id_rsa
-```
-
-#### HOSTとSSH_USER
-デプロイ先のサーバーホスト名（またはIPアドレス）とSSHログイン用ユーザー名を設定してください。
-
-### 本番サーバーの準備
-
-本番サーバーでは以下の準備が必要です：
-
-1. Dockerとdocker-composeのインストール
-2. デプロイ先ディレクトリの作成 (`mkdir -p ~/MinWeb2025-2`)
-3. SSH公開鍵の設定（authorized_keysへの追加）
-
-### デプロイの流れ
-
-mainブランチへの変更がプッシュされると、以下の手順で自動的にデプロイされます：
-
-1. SSH経由で本番サーバーに接続
-2. アプリケーションコードを本番サーバーにコピー 
-3. docker-composeでアプリケーションを再起動
-
-### 注意事項
-
-- デプロイスクリプトは基本的なものです。必要に応じてカスタマイズしてください。
-- 本番環境の環境変数は別途設定する必要があります。
-- 必要に応じてバックアップ戦略を実装してください。
-- デプロイ前に手動承認ステップを追加することも検討できます。
