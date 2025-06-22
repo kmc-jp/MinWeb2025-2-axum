@@ -9,6 +9,7 @@ services:
             - "3000:3000"
         environment:
             - DATABASE_URL=mysql://user:password@mysql:3306/minweb
+            - RUST_LOG=debug
         depends_on:
             mysql:
                 condition: service_healthy
