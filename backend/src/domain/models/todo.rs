@@ -14,7 +14,7 @@ pub struct Todo {
 }
 
 impl Todo {
-    pub fn new(title: String, description: String) -> Self {
+    pub fn new(title: String/*, description: String*/) -> Self {
         // 日本時間のオフセット（UTC+9時間）
         let jst = FixedOffset::east_opt(9 * 3600).unwrap();
         // 現在の日本時間を取得し、UTCに変換

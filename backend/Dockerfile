@@ -18,8 +18,7 @@ FROM debian:bookworm-slim
 # /usr/local/bin にビルドされたバイナリをコピー
 COPY --from=builder /usr/local/cargo/bin/backend /usr/local/bin/backend
 
-# ポート3000番を公開
-EXPOSE 3000
-
+# ポート3001番を公開
+EXPOSE 3001
 # コンテナ起動時にbackendを実行
 CMD ["backend"]
