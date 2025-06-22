@@ -6,9 +6,9 @@ services:
         volumes:
             - ./backend:/usr/src/app
         ports:
-            - "3001:3001"
+            - "3000:3000"
         environment:
-            - DATABASE_URL=mysql://mysql:password@localhost:3307/minweb
+            - DATABASE_URL=mysql://user:password@mysql:3306/minweb
             - RUST_LOG=debug
         depends_on:
             mysql:
@@ -25,7 +25,7 @@ services:
             - ./frontend:/app
             - frontend_build:/var/www/html
         environment:
-            - REACT_APP_API_URL=http://localhost:3001/api
+            - REACT_APP_API_URL=http://localhost:3000/api
         command: sh -c "npm install && npm run build && cp -r build/* /var/www/html/"
         depends_on:
             - backend
@@ -35,7 +35,7 @@ services:
     nginx:
         image: nginx:alpine
         ports:
-            - "81:81"
+            - "80:80"
         volumes:
             - ./nginx/conf.d:/etc/nginx/conf.d
             - ./nginx/logs:/var/log/nginx
@@ -50,7 +50,7 @@ services:
     mysql:
         image: mysql:8.0
         ports:
-            - "3307:3307"
+            - "3306:3306"
         volumes:
             - mysql_data:/var/lib/todo-axum-mysql
             - ./mysql/init:/docker-entrypoint-initdb.d

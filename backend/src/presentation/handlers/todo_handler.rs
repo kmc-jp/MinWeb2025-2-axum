@@ -24,11 +24,11 @@ pub fn create_todo_router<T: TodoService + Send + Sync + 'static + Clone>(todo_s
     };
 
     Router::new()
-        .route("/todos", get(get_all_todos::<T>).post(create_todo::<T>))
-        .route("/todos/{id}", get(get_todo_by_id::<T>)
+        .route("/", get(get_all_todos::<T>).post(create_todo::<T>))
+        .route("/{id}", get(get_todo_by_id::<T>)
             .put(update_todo::<T>)
             .delete(delete_todo::<T>))
-        .route("/todos/{id}/complete", put(complete_todo::<T>))
+        .route("/{id}/complete", put(complete_todo::<T>))
         .with_state(state)
 }
 
