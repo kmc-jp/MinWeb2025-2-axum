@@ -19,6 +19,6 @@ FROM debian:bookworm-slim
 COPY --from=builder /usr/local/cargo/bin/backend /usr/local/bin/backend
 
 # ポート3001番を公開
-EXPOSE 3001
+EXPOSE 3000
 # コンテナ起動時にbackendを実行
 CMD ["backend"]

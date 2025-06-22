@@ -51,7 +51,7 @@ impl<T: TodoRepository + Send + Sync + Clone> TodoService for TodoUsecase<T> {
     }
 
     async fn complete_todo(&self, id: Uuid) -> Result<Todo, sqlx::Error> {
-        let mut todo = self.repository.find_by_id(id).await?;
+        let todo = self.repository.find_by_id(id).await?;
         if let Some(mut t) = todo {
             t.completed = true;
             t.updated_at = chrono::Utc::now();

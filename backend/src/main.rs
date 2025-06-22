@@ -1,5 +1,5 @@
 use axum::{Router, routing::get};
-use dotenvy::dotenv;
+// use dotenvy::dotenv;
 use sqlx::MySqlPool;
 use std::env;
 use std::net::SocketAddr;
@@ -19,7 +19,7 @@ mod usecase;
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // ✅ .env 読み込み
-    dotenv().ok();
+    // dotenv().ok();
 
     // ✅ ロギング設定
     let subscriber = FmtSubscriber::builder()
@@ -29,6 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // ✅ データベース接続
     let database_url = env::var("DATABASE_URL")?;
+    println!("Connecting to database at: {}", database_url);
     let pool = MySqlPool::connect(&database_url).await?;
 
     // ✅ 依存関係のセットアップ
@@ -38,11 +39,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     // ✅ ルーターの作成
     let app = Router::new()
         .route("/", get(|| async { "Hello, Axum!!!" }))
-        .nest("/api", create_todo_router(todo_service));
+        .nest("/api/", create_todo_router(todo_service));
 
     // ✅ サーバーの起動
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3001));
-    info!("🚀 Server running at http://{}", addr);
+    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    info!("🚀　Backend Server running");
     let listener = TcpListener::bind(addr).await?;
     axum::serve(listener, app.into_make_service()).await?;
 
