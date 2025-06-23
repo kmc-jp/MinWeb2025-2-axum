@@ -6,7 +6,7 @@
 /frontend/package-lock.json
 
 
-/nginx/logs
+/nginx/logs/
 
 =======
 .env
