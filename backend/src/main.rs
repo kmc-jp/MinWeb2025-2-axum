@@ -38,8 +38,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // ✅ ルーターの作成
     let app = Router::new()
-        .route("/", get(|| async { "Hello, Axum!!!" }))
-        .nest("/api/todos/", create_todo_router(todo_service));
+        .route("/api/", get(|| async { "Hello, Axum!!!" }))
+        .nest("/api/todos", create_todo_router(todo_service));
 
     // ✅ サーバーの起動
     let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
