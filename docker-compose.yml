@@ -17,7 +17,6 @@ services:
         networks:
             - app-network
         working_dir: /usr/src/app
-        command: cargo run ./src/main.rs
     frontend:
         image: node:20-alpine
         working_dir: /app

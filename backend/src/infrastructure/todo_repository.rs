@@ -19,7 +19,7 @@ impl TodoRepositoryImpl {
 impl TodoRepository for TodoRepositoryImpl {
     async fn find_all(&self) -> Result<Vec<Todo>, sqlx::Error> {
         let todos = sqlx::query_as::<_, Todo>(
-            "SELECT id, title, completed, created_at, updated_at FROM todos"
+            "SELECT id, title, completed, created_at, updated_at FROM todos",
         )
         .fetch_all(&self.pool)
         .await?;
@@ -28,7 +28,7 @@ impl TodoRepository for TodoRepositoryImpl {
 
     async fn find_by_id(&self, id: Uuid) -> Result<Option<Todo>, sqlx::Error> {
         let todo = sqlx::query_as::<_, Todo>(
-            "SELECT id, title, completed, created_at, updated_at FROM todos WHERE id = $1"
+            "SELECT id, title, completed, created_at, updated_at FROM todos WHERE id = ?",
         )
         .bind(id)
         .fetch_optional(&self.pool)
@@ -37,39 +37,43 @@ impl TodoRepository for TodoRepositoryImpl {
     }
 
     async fn create(&self, todo: Todo) -> Result<Todo, sqlx::Error> {
-        let created_todo = sqlx::query_as::<_, Todo>(
+        sqlx::query(
             "INSERT INTO todos (id, title, completed, created_at, updated_at)
-             VALUES ($1, $2, $3, $4, $5)
-             RETURNING id, title, completed, created_at, updated_at"
+             VALUES (?, ?, ?, ?, ?)",
         )
         .bind(todo.id)
         .bind(&todo.title)
-        // .bind(&todo.description)
         .bind(todo.completed)
         .bind(todo.created_at)
         .bind(todo.updated_at)
-        .fetch_one(&self.pool)
+        .execute(&self.pool)
         .await?;
-        Ok(created_todo)
+        // MySQLにはRETURNING句がないため、引数で受け取ったtodoをそのまま返す
+        Ok(todo)
     }
 
     async fn update(&self, todo: Todo) -> Result<Todo, sqlx::Error> {
-        let updated_todo = sqlx::query_as::<_, Todo>(
-            "UPDATE todos SET title = $1, completed = $2, updated_at = (NOW() AT TIME ZONE 'Asia/Tokyo')
-             WHERE id = $3
-             RETURNING id, title, completed, created_at, updated_at"
+        // MySQLにはRETURNING句がないため、まず更新処理を行う
+        sqlx::query(
+            "UPDATE todos SET title = ?, completed = ?, updated_at = NOW()
+             WHERE id = ?",
         )
         .bind(&todo.title)
-        // .bind(&todo.description)
         .bind(todo.completed)
         .bind(todo.id)
-        .fetch_one(&self.pool)
+        .execute(&self.pool)
         .await?;
+
+        // 更新後のデータを取得するために、find_by_idを呼び出す
+        let updated_todo = self.find_by_id(todo.id).await?.ok_or_else(|| {
+            sqlx::Error::RowNotFound
+        })?;
+
         Ok(updated_todo)
     }
 
     async fn delete(&self, id: Uuid) -> Result<(), sqlx::Error> {
-        sqlx::query("DELETE FROM todos WHERE id = $1")
+        sqlx::query("DELETE FROM todos WHERE id = ?")
             .bind(id)
             .execute(&self.pool)
             .await?;

@@ -4,21 +4,17 @@ FROM rust:1-slim as builder
 WORKDIR /usr/src/app
 COPY . .
 
-# ビルドキャッシュをマウントする場合
-# RUN --mount=type=cache,target=/usr/local/cargo/registry \\
-#     --mount=type=cache,target=target \\
-#     cargo build --release
-
-# ビルドキャッシュを利用しない場合
-RUN cargo install --path .
+# Build the application
+RUN cargo build --release
 
 # Final Stage
 FROM debian:bookworm-slim
 
-# /usr/local/bin にビルドされたバイナリをコピー
-COPY --from=builder /usr/local/cargo/bin/backend /usr/local/bin/backend
+# Copy the built binary from the builder stage to a directory in the PATH
+COPY --from=builder /usr/src/app/target/release/backend /usr/local/bin/backend
 
-# ポート3000番を公開
+# Expose port 3000
 EXPOSE 3000
-# コンテナ起動時にbackendを実行
-CMD ["backend"]
+
+# Set the entrypoint to run the application
+ENTRYPOINT ["/usr/local/bin/backend"]
